@@ -9,6 +9,8 @@ public class Constants {
 	public static final int Node_Results = 3;
 	public static final int Node_Complete = 4;
 	public static final int Election_Message = 5;
+	public static final int Fetch_Request = 6;
+	public static final int Fetch_Response = 7;
 	
 	// URL states
 	public static final int URL_Ready = 5;

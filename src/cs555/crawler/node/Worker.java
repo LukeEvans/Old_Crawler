@@ -1,7 +1,6 @@
 package cs555.crawler.node;
 
 import cs555.crawler.communications.Link;
-import cs555.crawler.peer.Peer;
 import cs555.crawler.utilities.Constants;
 import cs555.crawler.utilities.Tools;
 import cs555.crawler.wireformats.ElectionMessage;
