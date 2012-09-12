@@ -117,5 +117,9 @@ public class NodeManager extends Node{
 		// Broadcast our election message
 		manager.broadcastElection();
 		
+		// If we should continue, continue
+		while (manager.shouldContinue()){
+			manager.beginRound();
+		}
 	}
 }
