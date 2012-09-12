@@ -1,5 +1,5 @@
 package cs555.crawler.wireformats;
 
-public class FetchResponse {
+public class FetchResponse extends FetchRequest{
 
 }

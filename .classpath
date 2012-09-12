@@ -2,5 +2,7 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="/Users/levans/Downloads/HTMLParser-2.0-SNAPSHOT/lib/htmllexer.jar"/>
+	<classpathentry kind="lib" path="/Users/levans/Downloads/HTMLParser-2.0-SNAPSHOT/lib/htmlparser.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

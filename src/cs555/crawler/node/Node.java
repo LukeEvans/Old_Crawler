@@ -13,7 +13,7 @@ import cs555.crawler.wireformats.*;
 public class Node {
 
 	ServerSockThread server;
-
+	
 	// Configuration 
 	int serverPort;
 

@@ -1,7 +1,5 @@
 package cs555.crawler.pool;
 
-import java.io.IOException;
-
 /**
  * 
  * @author levans

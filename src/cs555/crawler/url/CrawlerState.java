@@ -11,9 +11,9 @@ import cs555.crawler.utilities.*;
 
 public class CrawlerState {
 
-	Stack<URL> readyStack;
-	ArrayList<URL> pendingList;
-	ArrayList<URL> doneList;
+	Stack<Page> readyStack;
+	ArrayList<Page> pendingList;
+	ArrayList<Page> doneList;
 	
 	String linkFile;
 	
@@ -23,9 +23,9 @@ public class CrawlerState {
 	public CrawlerState(String lf){
 		linkFile = lf;
 		
-		readyStack = new Stack<URL>();
-		pendingList = new ArrayList<URL>();
-		doneList = new ArrayList<URL>();
+		readyStack = new Stack<Page>();
+		pendingList = new ArrayList<Page>();
+		doneList = new ArrayList<Page>();
 		
 		buildState();
 	}
@@ -57,8 +57,8 @@ public class CrawlerState {
 		
 		if (stringParts.length == 2){
 			String urlString = stringParts[0];
-			URL url = new URL(urlString);
-			addURL(url);
+			Page url = new Page(urlString);
+			addPage(url);
 			
 		}
 	}
@@ -68,10 +68,10 @@ public class CrawlerState {
 	// Accessor
 	//================================================================================
 	// Get next ready URL
-	public URL getNextReadyURL(){
+	public Page getNextReadyPage(){
 		
 		if (!readyStack.isEmpty()){
-			URL url = readyStack.pop();
+			Page url = readyStack.pop();
 			url.status = Constants.URL_Pending;
 			pendingList.add(url);
 			
@@ -85,14 +85,14 @@ public class CrawlerState {
 	// List manipulation 
 	//================================================================================
 	// Add peer
-	public void addURL(URL u){
+	public void addPage(Page u){
 		if (!contains(u)){
 			readyStack.add(u);
 		}
 	}
 	
-	public URL findPendingUrl(URL u){
-		for (URL url : pendingList){
+	public Page findPendingUrl(Page u){
+		for (Page url : pendingList){
 			if (url.equals(u)){
 				return url;
 			}
@@ -102,8 +102,8 @@ public class CrawlerState {
 	}
 	
 	// Mark complete
-	public void markUrlComplete(URL u){
-		URL url = findPendingUrl(u);
+	public void markUrlComplete(Page u){
+		Page url = findPendingUrl(u);
 		
 		if (url != null){
 			url.status = Constants.URL_Complete;
@@ -116,21 +116,21 @@ public class CrawlerState {
 	// House Keeping
 	//================================================================================
 	// Override .contains method
-	public boolean contains(URL url) {
+	public boolean contains(Page url) {
 
-		for (URL u : readyStack){
+		for (Page u : readyStack){
 			if (url.equals(u)){
 				return true;
 			}
 		}
 		
-		for (URL u : pendingList){
+		for (Page u : pendingList){
 			if (url.equals(u)){
 				return true;
 			}
 		}
 
-		for (URL u : doneList){
+		for (Page u : doneList){
 			if (url.equals(u)){
 				return true;
 			}
@@ -144,19 +144,19 @@ public class CrawlerState {
 		String s = "";
 
 		s += "\nReady:\n";
-		for (URL u : readyStack){
+		for (Page u : readyStack){
 			s += u.toString() + "\n";
 		}
 		
 		s += "\nPending:\n";
 		
-		for (URL u : pendingList){
+		for (Page u : pendingList){
 			s += u.toString() + "\n";
 		}
 		
 		s += "\nDone:\n";
 		
-		for (URL u : doneList){
+		for (Page u : doneList){
 			s += u.toString() + "\n";
 		}
 		

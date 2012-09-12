@@ -4,19 +4,21 @@ import cs555.crawler.communications.Link;
 import cs555.crawler.utilities.Constants;
 import cs555.crawler.utilities.Tools;
 import cs555.crawler.wireformats.ElectionMessage;
-
+import cs555.crawler.wireformats.Verification;
+import cs555.crawler.pool.*;
 
 public class Worker extends Node{
 
 	Link nodeManagerLink;
+	ThreadPoolManager poolManager;
 
 	//================================================================================
 	// Constructor
 	//================================================================================
-	public Worker(int port){
+	public Worker(int port,int threads){
 		super(port);
 		nodeManagerLink = null;
-
+		poolManager = new ThreadPoolManager(threads);
 	}
 
 
@@ -33,10 +35,17 @@ public class Worker extends Node{
 			ElectionMessage election = new ElectionMessage();
 			election.unmarshall(bytes);
 			
+			Verification electionReply = new Verification(election.number);
+			l.sendData(electionReply.marshall());
 			nodeManagerLink = l;
+			
 			
 			break;
 
+		case Constants.Fetch_Request:
+			
+			break;
+			
 		default:
 
 			System.out.println("Unrecognized Message");
@@ -53,23 +62,25 @@ public class Worker extends Node{
 	public static void main(String[] args){
 
 		int port = 0;
-
-		if (args.length == 3) {
+		int threads = 5;
+		
+		if (args.length == 1) {
 			port = Integer.parseInt(args[0]);
 		}
 
-		else if (args.length == 4){
+		else if (args.length == 2){
 			port = Integer.parseInt(args[0]);
+			threads = Integer.parseInt(args[1]);
 		}
 
 		else {
-			System.out.println("Usage: java node.Worker PORT");
+			System.out.println("Usage: java node.Worker PORT <THREADS>");
 			System.exit(1);
 		}
 
 
 		// Create node
-		Worker worker = new Worker(port);
+		Worker worker = new Worker(port,threads);
 		worker.initServer();
 
 	}

@@ -2,7 +2,7 @@ package cs555.crawler.url;
 
 import cs555.crawler.utilities.*;
 
-public class URL {
+public class Page {
 
 	public int status;
 	public String urlString;
@@ -10,7 +10,7 @@ public class URL {
 	//================================================================================
 	// Constructor
 	//================================================================================
-	public URL(String url){
+	public Page(String url){
 		urlString = url;
 		status = Constants.URL_Ready;
 	}
@@ -21,7 +21,7 @@ public class URL {
 	// House Keeping
 	//================================================================================
 	// Override .equals
-	public boolean equals(URL other){
+	public boolean equals(Page other){
 		if (this.urlString.equalsIgnoreCase(other.urlString)){
 			return true;
 		}
