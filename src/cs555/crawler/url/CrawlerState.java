@@ -16,16 +16,18 @@ public class CrawlerState {
 	ArrayList<Page> doneList;
 	
 	String linkFile;
+	int maxDepth;
 	
 	//================================================================================
 	// Constructor
 	//================================================================================
-	public CrawlerState(String lf){
+	public CrawlerState(String lf, int depth){
 		linkFile = lf;
 		
 		readyStack = new Stack<Page>();
 		pendingList = new ArrayList<Page>();
 		doneList = new ArrayList<Page>();
+		maxDepth = depth;
 		
 		buildState();
 	}
@@ -81,13 +83,27 @@ public class CrawlerState {
 		return null;
 	}
 	
+	// Get multiple pages
+	public ArrayList<Page> getNextReadySet(int n){
+		ArrayList<Page> readySet= new ArrayList<Page>();
+		
+		for (int i=0; i<n; i++){
+			readySet.add(getNextReadyPage());
+		}
+		
+		return readySet;
+	}
+	
 	//================================================================================
 	// List manipulation 
 	//================================================================================
 	// Add peer
 	public void addPage(Page u){
 		if (!contains(u)){
-			readyStack.add(u);
+			if (u.depth < maxDepth){
+				readyStack.add(u);
+			}
+			
 		}
 	}
 	
@@ -110,6 +126,19 @@ public class CrawlerState {
 			pendingList.remove(url);
 			doneList.add(url);
 		}
+	}
+	
+	
+	
+	//================================================================================
+	// Completion methods 
+	//================================================================================
+	public boolean shouldContinue(){
+		return readyLinksRemaining();
+	}
+	
+	public boolean readyLinksRemaining(){
+		return !readyStack.isEmpty();
 	}
 	
 	//================================================================================
@@ -162,4 +191,5 @@ public class CrawlerState {
 		
 		return s;
 	}
+	
 }

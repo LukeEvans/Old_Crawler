@@ -1,10 +1,12 @@
 package cs555.crawler.node;
 
 import cs555.crawler.communications.Link;
+import cs555.crawler.peer.Peer;
 import cs555.crawler.peer.PeerList;
 import cs555.crawler.url.CrawlerState;
 import cs555.crawler.utilities.Constants;
 import cs555.crawler.utilities.Tools;
+import cs555.crawler.wireformats.ElectionMessage;
 
 public class NodeManager extends Node{
 	
@@ -29,7 +31,30 @@ public class NodeManager extends Node{
 		
 	}
 	
+	//================================================================================
+	// Round
+	//================================================================================
+	public boolean shouldContinue(){
+		return state.shouldContinue();
+	}
 	
+	public void beginRound(){
+		// Get Peer
+		Peer peer = peerList.getNextPeer();
+		Link link = connect(peer);
+		
+		// Get links
+		
+	}
+	
+	//================================================================================
+	// Send
+	//================================================================================
+	public void broadcastElection(){
+		ElectionMessage electionMsg = new ElectionMessage(Constants.Election_Message);
+		broadcastMessage(peerList.getAllPeers(), electionMsg.marshall());
+	}
+
 	
 	//================================================================================
 	// Receive
@@ -83,11 +108,14 @@ public class NodeManager extends Node{
 
 		// Create peer list
 		PeerList peerList = new PeerList(slaveFile, port);
-		CrawlerState state = new CrawlerState(linkFile);
+		CrawlerState state = new CrawlerState(linkFile,maxDepth);
 
 		// Create node
 		NodeManager manager = new  NodeManager(state, peerList, port, linkFile, slaveFile, maxDepth);
 		manager.initServer();
+		
+		// Broadcast our election message
+		manager.broadcastElection();
 		
 	}
 }

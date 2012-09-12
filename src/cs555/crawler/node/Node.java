@@ -2,6 +2,7 @@ package cs555.crawler.node;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.util.ArrayList;
 
 
 import cs555.crawler.communications.*;
@@ -57,6 +58,22 @@ public class Node {
 		link.sendData(payload.marshall());
 	}
 
+	//================================================================================
+	// Broadcast
+	//================================================================================
+	public void broadcastMessage(ArrayList<Peer> nodes, byte[] data){
+		for (Peer peer : nodes){
+			Link link = connect(peer);
+			link.sendData(data);
+			
+			byte[] reply = link.waitForData();
+			
+			if (!reply.equals(data)){
+				System.out.println("reply data doesn't match");
+				System.exit(1);
+			}
+		}
+	}
 
 	//================================================================================
 	// Receive

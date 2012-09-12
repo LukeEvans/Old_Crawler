@@ -4,6 +4,7 @@ import cs555.crawler.communications.Link;
 import cs555.crawler.utilities.Constants;
 import cs555.crawler.utilities.Tools;
 import cs555.crawler.wireformats.ElectionMessage;
+import cs555.crawler.wireformats.FetchRequest;
 import cs555.crawler.wireformats.Verification;
 import cs555.crawler.pool.*;
 
@@ -39,10 +40,18 @@ public class Worker extends Node{
 			l.sendData(electionReply.marshall());
 			nodeManagerLink = l;
 			
+			System.out.println("Elected Official");
 			
 			break;
 
 		case Constants.Fetch_Request:
+			FetchRequest request = new FetchRequest();
+			request.unmarshall(bytes);
+			
+			for (String url : request.links){
+				FetchParseTask task = new FetchParseTask(url,request);
+				poolManager.execute(task);
+			}
 			
 			break;
 			

@@ -6,6 +6,7 @@ public class Page {
 
 	public int status;
 	public String urlString;
+	public int depth;
 	
 	//================================================================================
 	// Constructor
@@ -13,9 +14,14 @@ public class Page {
 	public Page(String url){
 		urlString = url;
 		status = Constants.URL_Ready;
+		depth = 0;
 	}
 	
-
+	public Page(String url, int d){
+		urlString = url;
+		status = Constants.URL_Ready;
+		depth = d;
+	}
 	
 	//================================================================================
 	// House Keeping
