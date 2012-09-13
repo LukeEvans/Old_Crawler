@@ -4,9 +4,11 @@ import cs555.crawler.communications.Link;
 import cs555.crawler.peer.Peer;
 import cs555.crawler.peer.PeerList;
 import cs555.crawler.url.CrawlerState;
+import cs555.crawler.url.Page;
 import cs555.crawler.utilities.Constants;
 import cs555.crawler.utilities.Tools;
 import cs555.crawler.wireformats.ElectionMessage;
+import cs555.crawler.wireformats.FetchRequest;
 
 public class NodeManager extends Node{
 	
@@ -44,7 +46,11 @@ public class NodeManager extends Node{
 		Link link = connect(peer);
 		
 		// Get links
+		Page page = state.getNextReadyPage();
+		FetchRequest request = page.getFetchRequest();
+		link.sendData(request.marshall());
 		
+		System.out.println("Sent: \n" + request);
 	}
 	
 	//================================================================================
@@ -52,7 +58,7 @@ public class NodeManager extends Node{
 	//================================================================================
 	public void broadcastElection(){
 		ElectionMessage electionMsg = new ElectionMessage(Constants.Election_Message);
-		broadcastMessage(peerList.getAllPeers(), electionMsg.marshall());
+		broadcastMessage(peerList.getAllPeers(), electionMsg.marshall(),Constants.Election_Message);
 	}
 
 	

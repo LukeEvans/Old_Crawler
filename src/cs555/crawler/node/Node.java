@@ -14,7 +14,7 @@ import cs555.crawler.wireformats.*;
 public class Node {
 
 	ServerSockThread server;
-	
+
 	// Configuration 
 	int serverPort;
 
@@ -27,7 +27,7 @@ public class Node {
 		server = new ServerSockThread(serverPort, this);
 	}
 
-	
+
 	public void initServer(){
 		server.start();
 	}
@@ -61,15 +61,15 @@ public class Node {
 	//================================================================================
 	// Broadcast
 	//================================================================================
-	public void broadcastMessage(ArrayList<Peer> nodes, byte[] data){
+	public void broadcastMessage(ArrayList<Peer> nodes, byte[] data, int expectedReply){
 		for (Peer peer : nodes){
 			Link link = connect(peer);
 			link.sendData(data);
+
+			int replyInt = link.waitForIntReply();
 			
-			byte[] reply = link.waitForData();
-			
-			if (!reply.equals(data)){
-				System.out.println("reply data doesn't match");
+			if (expectedReply != replyInt){
+				System.out.println("Reply Doesn't match");
 				System.exit(1);
 			}
 		}

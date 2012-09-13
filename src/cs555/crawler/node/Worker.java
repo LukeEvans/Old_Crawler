@@ -48,6 +48,8 @@ public class Worker extends Node{
 			FetchRequest request = new FetchRequest();
 			request.unmarshall(bytes);
 			
+			System.out.println("Got: \n" + request);
+			
 			for (String url : request.links){
 				FetchParseTask task = new FetchParseTask(url,request);
 				poolManager.execute(task);

@@ -55,14 +55,8 @@ public class CrawlerState {
 	
 	// Turn a line of text into a peer
 	public void createURLFromLine(String line){
-		String[] stringParts = line.split("\\s+");
-		
-		if (stringParts.length == 2){
-			String urlString = stringParts[0];
-			Page url = new Page(urlString);
-			addPage(url);
-			
-		}
+		Page p = new Page(line);
+		addPage(p);
 	}
 	
 	
@@ -138,6 +132,7 @@ public class CrawlerState {
 	}
 	
 	public boolean readyLinksRemaining(){
+		boolean isEmpty = readyStack.isEmpty();
 		return !readyStack.isEmpty();
 	}
 	
