@@ -2,20 +2,20 @@ package cs555.crawler.pool;
 
 import java.net.URL;
 
-//import org.htmlparser.beans.*;
+import org.htmlparser.beans.*;
 
 import cs555.crawler.communications.Link;
 import cs555.crawler.wireformats.*;
 
-public class FetchParseTask implements Task{
+public class FetchParseTask extends Thread{
 
 	Link link;
 	int runningThread;
 	FetchRequest request;
 	
 	// Fetchers
-	//HTMLTextBean textFetcher;
-	//HTMLLinkBean linkfetcher;
+	HTMLTextBean textFetcher;
+	HTMLLinkBean linkfetcher;
 	
 	// URL
 	String urlString;
@@ -28,27 +28,26 @@ public class FetchParseTask implements Task{
 	//================================================================================
 	// Constructor
 	//================================================================================
-	public FetchParseTask(String url, FetchRequest req){
-		//textFetcher = new HTMLTextBean();
-		//linkfetcher = new HTMLLinkBean();
-		
+	public FetchParseTask(Link l, String url, FetchRequest req){
+		link = l;
+		textFetcher = new HTMLTextBean();
+		linkfetcher = new HTMLLinkBean();
+		urlString = url;
 		request = req;
 		
-		//textFetcher.setURL(url);
-		//linkfetcher.setURL(url);
+		textFetcher.setURL(url);
+		linkfetcher.setURL(url);
 	}
 	
 	//================================================================================
 	// Run
 	//================================================================================
 	public void run() {
-//		URL[] links = linkfetcher.getLinks();
-//		FetchResponse response = new FetchResponse(request.domain, request.depth + 1, urlString, links);
-//		link.sendData(response.marshall());
-//		
-//		String text = textFetcher.getText();
-//		SaveTask saver = new SaveTask(urlString, text);
-//		saver.run();
+		URL[] links = linkfetcher.getLinks();
+		
+		FetchResponse response = new FetchResponse(request.domain, request.depth + 1, urlString, links);
+		System.out.println("Sent: "+ response);
+		link.sendData(response.marshall());
 		
 		System.out.println("Fetching: " + urlString);
 	}

@@ -9,6 +9,7 @@ import cs555.crawler.utilities.Constants;
 import cs555.crawler.utilities.Tools;
 import cs555.crawler.wireformats.ElectionMessage;
 import cs555.crawler.wireformats.FetchRequest;
+import cs555.crawler.wireformats.FetchResponse;
 
 public class NodeManager extends Node{
 	
@@ -68,9 +69,15 @@ public class NodeManager extends Node{
 	// Receieve data
 	public synchronized void receive(byte[] bytes, Link l){
 		int messageType = Tools.getMessageType(bytes);
+		System.out.println("getting");
 		
 		switch (messageType) {
-		case Constants.Payload:
+		case Constants.Fetch_Response:
+			
+			FetchResponse response = new FetchResponse();
+			response.unmarshall(bytes);
+			
+			System.out.println("Got: " + response);
 			
 			break;
 
@@ -124,8 +131,8 @@ public class NodeManager extends Node{
 		manager.broadcastElection();
 		
 		// If we should continue, continue
-		while (manager.shouldContinue()){
+//		while (manager.shouldContinue()){
 			manager.beginRound();
-		}
+//		}
 	}
 }

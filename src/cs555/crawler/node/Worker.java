@@ -23,7 +23,10 @@ public class Worker extends Node{
 	}
 
 
-
+	public void initServer(){
+		super.initServer();
+		poolManager.start();
+	}
 	//================================================================================
 	// Receive
 	//================================================================================
@@ -50,10 +53,9 @@ public class Worker extends Node{
 			
 			System.out.println("Got: \n" + request);
 			
-			for (String url : request.links){
-				FetchParseTask task = new FetchParseTask(url,request);
-				poolManager.execute(task);
-			}
+			FetchParseTask task = new FetchParseTask(nodeManagerLink, request.url, request);
+			//poolManager.execute(task);
+			task.start();
 			
 			break;
 			

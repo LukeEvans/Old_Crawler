@@ -32,7 +32,9 @@ public class FetchRequest {
 	}
 	
 	public FetchRequest(String d, int dep, String u, URL[] urls){
-		init(d, dep, u, removeUnrelatedLinks(urls));
+		System.out.println("Going into init");
+		init(d, dep, u, removeUnrelatedLinks(urls,d));
+		System.out.println("coming out of init");
 		
 	}
 	
@@ -152,12 +154,13 @@ public class FetchRequest {
 	}
 	
 	
-	public ArrayList<String> removeUnrelatedLinks(URL[] urls){
+	public ArrayList<String> removeUnrelatedLinks(URL[] urls,String d){
 		ArrayList<String> relatedLinks = new ArrayList<String>();
 		
 		for (URL url : urls){
 			String urlString = url.toString();
-			if (!urlString.startsWith(domain)){
+		
+			if (urlString.startsWith(d)){
 				relatedLinks.add(urlString);
 			}
 		}

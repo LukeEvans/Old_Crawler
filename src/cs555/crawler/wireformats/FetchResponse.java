@@ -11,18 +11,19 @@ public class FetchResponse extends FetchRequest{
 	// Overridden Constructors
 	//================================================================================
 	public FetchResponse(String d, int dep, String u, ArrayList<String> list){
-		init(d, dep, u, list);
+		super.init(d, dep, u, list);
 		type = Constants.Fetch_Response;
 		
 	}
 	
 	public FetchResponse(String d, int dep, String u, URL[] urls){
-		init(d, dep, u, removeUnrelatedLinks(urls));
+		super(d, dep, u, urls);
 		type = Constants.Fetch_Response;
+		System.out.println("Finished construction");
 	}
 	
 	public FetchResponse(){
-		init("", 0, "", new ArrayList<String>());
+		super.init("", 0, "", new ArrayList<String>());
 		type = Constants.Fetch_Response;
 	}
 }
