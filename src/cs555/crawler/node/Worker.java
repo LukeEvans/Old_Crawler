@@ -6,11 +6,12 @@ import cs555.crawler.utilities.Tools;
 import cs555.crawler.wireformats.ElectionMessage;
 import cs555.crawler.wireformats.FetchRequest;
 import cs555.crawler.wireformats.Verification;
+import cs555.crawler.peer.Peer;
 import cs555.crawler.pool.*;
 
 public class Worker extends Node{
 
-	Link nodeManagerLink;
+	Peer nodeManager;
 	ThreadPoolManager poolManager;
 
 	//================================================================================
@@ -18,7 +19,7 @@ public class Worker extends Node{
 	//================================================================================
 	public Worker(int port,int threads){
 		super(port);
-		nodeManagerLink = null;
+		nodeManager = null;
 		poolManager = new ThreadPoolManager(threads);
 	}
 
@@ -39,11 +40,12 @@ public class Worker extends Node{
 			ElectionMessage election = new ElectionMessage();
 			election.unmarshall(bytes);
 			
-			Verification electionReply = new Verification(election.number);
+			Verification electionReply = new Verification(election.type);
 			l.sendData(electionReply.marshall());
-			nodeManagerLink = l;
 			
-			System.out.println("Elected Official");
+			nodeManager = new Peer(election.host, election.port);
+			
+			System.out.println("Elected Official: " + election);
 			
 			break;
 
@@ -53,9 +55,8 @@ public class Worker extends Node{
 			
 			System.out.println("Got: \n" + request);
 			
-			FetchParseTask task = new FetchParseTask(nodeManagerLink, request.url, request);
-			//poolManager.execute(task);
-			task.start();
+			FetchParseTask task = new FetchParseTask(connect(nodeManager), request.url, request);
+			poolManager.execute(task);
 			
 			break;
 			

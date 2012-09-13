@@ -7,7 +7,7 @@ import org.htmlparser.beans.*;
 import cs555.crawler.communications.Link;
 import cs555.crawler.wireformats.*;
 
-public class FetchParseTask extends Thread{
+public class FetchParseTask implements Task {
 
 	Link link;
 	int runningThread;
@@ -47,9 +47,7 @@ public class FetchParseTask extends Thread{
 		
 		FetchResponse response = new FetchResponse(request.domain, request.depth + 1, urlString, links);
 		System.out.println("Sent: "+ response);
-		link.sendData(response.marshall());
-		
-		System.out.println("Fetching: " + urlString);
+		link.sendData(response.marshall());		
 	}
 
 	

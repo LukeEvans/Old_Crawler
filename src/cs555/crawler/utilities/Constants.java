@@ -22,5 +22,5 @@ public class Constants {
 	public static final int Success = 100;
 	
 	// Message sizes
-	public static final int LEN_BYTES = 2048;
+	public static final int LEN_BYTES = 3072;
 }

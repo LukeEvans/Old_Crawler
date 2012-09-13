@@ -32,9 +32,7 @@ public class FetchRequest {
 	}
 	
 	public FetchRequest(String d, int dep, String u, URL[] urls){
-		System.out.println("Going into init");
 		init(d, dep, u, removeUnrelatedLinks(urls,d));
-		System.out.println("coming out of init");
 		
 	}
 	
@@ -103,7 +101,7 @@ public class FetchRequest {
 		
 		// Size
 		size = bbuff.getInt();
-		
+			
 		// type
 		type = bbuff.getInt();
 		
@@ -125,7 +123,7 @@ public class FetchRequest {
 		
 		// number of links and links
 		numberOfLinks = bbuff.getInt();
-		for (int i=0; i<numberOfLinks; i++){
+		for (int i=0; i<numberOfLinks; i++){			
 			int strLen = bbuff.getInt();
 			byte[] stringBytes = new byte[strLen];
 			bbuff.get(stringBytes);

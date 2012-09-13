@@ -58,7 +58,7 @@ public class NodeManager extends Node{
 	// Send
 	//================================================================================
 	public void broadcastElection(){
-		ElectionMessage electionMsg = new ElectionMessage(Constants.Election_Message);
+		ElectionMessage electionMsg = new ElectionMessage(serverPort, Tools.getLocalHostname());
 		broadcastMessage(peerList.getAllPeers(), electionMsg.marshall(),Constants.Election_Message);
 	}
 

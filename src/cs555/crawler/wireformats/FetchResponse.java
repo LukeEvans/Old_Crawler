@@ -19,7 +19,6 @@ public class FetchResponse extends FetchRequest{
 	public FetchResponse(String d, int dep, String u, URL[] urls){
 		super(d, dep, u, urls);
 		type = Constants.Fetch_Response;
-		System.out.println("Finished construction");
 	}
 	
 	public FetchResponse(){
