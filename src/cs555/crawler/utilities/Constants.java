@@ -27,7 +27,7 @@ public class Constants {
 	public static final int Failure = 99;
 	public static final int Success = 100;
 	
-	public static final int depth = 2;
+	public static final int depth = 3;
 	
 	
 	// Message sizes
