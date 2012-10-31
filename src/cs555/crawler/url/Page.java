@@ -1,6 +1,7 @@
 package cs555.crawler.url;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import cs555.crawler.utilities.*;
 import cs555.crawler.wireformats.FetchRequest;
@@ -11,7 +12,7 @@ public class Page {
 	public String urlString;
 	public int depth;
 	public String domain;
-	ArrayList<Page> links;
+	PageMetadata metaData;
 	
 	//================================================================================
 	// Constructor
@@ -21,7 +22,8 @@ public class Page {
 		domain = urlString;
 		status = Constants.URL_Ready;
 		depth = 0;
-		links = new ArrayList<Page>();
+		metaData = new PageMetadata();
+		
 	}
 	
 	public Page(String url, int dep, String d){
@@ -29,25 +31,22 @@ public class Page {
 		domain = d;
 		status = Constants.URL_Ready;
 		depth = dep;
-		links = new ArrayList<Page>();
+		metaData = new PageMetadata();
+		
 	}
 	
 	//================================================================================
 	// Modifiers
 	//================================================================================
 	public FetchRequest getFetchRequest(){
-		return new FetchRequest(domain, depth, urlString, stringLinks());
+		return new FetchRequest(domain, depth, urlString, metaData.links);
 	}
 	
-	public ArrayList<String> stringLinks(){
-		ArrayList<String> stringLinks = new ArrayList<String>();
-		
-		for (Page p : links){
-			stringLinks.add(p.urlString);
-		}
-		
-		return stringLinks;
+	public void accumulate(ArrayList<String> links, HashMap<String, Integer> fileMap) {
+		metaData.addLinks(links);
+		metaData.parseFiles(fileMap);
 	}
+	
 	//================================================================================
 	// House Keeping
 	//================================================================================

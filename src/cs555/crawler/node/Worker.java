@@ -1,5 +1,8 @@
 package cs555.crawler.node;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
 import cs555.crawler.communications.Link;
 import cs555.crawler.url.CrawlerState;
 import cs555.crawler.url.Page;
@@ -7,6 +10,7 @@ import cs555.crawler.utilities.Constants;
 import cs555.crawler.utilities.Tools;
 import cs555.crawler.wireformats.ElectionMessage;
 import cs555.crawler.wireformats.FetchRequest;
+import cs555.crawler.wireformats.HandoffLookup;
 import cs555.crawler.wireformats.Verification;
 import cs555.crawler.peer.Peer;
 import cs555.crawler.pool.*;
@@ -66,8 +70,7 @@ public class Worker extends Node{
 			
 			System.out.println("Got: \n" + request);
 			
-			FetchParseTask task = new FetchParseTask(managerLink, request.url, request);
-			poolManager.execute(task);
+			publishLink(request);
 			
 			break;
 			
@@ -91,12 +94,37 @@ public class Worker extends Node{
 			Page page = new Page(request.url, request.depth, request.domain);
 			state.addPage(page);
 			state.makrUrlPending(page);
-			fetchURL(request);
+			fetchURL(page, request);
 		}
 	}
 	
 	
-	public void fetchURL(FetchRequest request) {
+	public void fetchURL(Page page, FetchRequest request) {
+		FetchParseTask fetcher = new FetchParseTask(page, request, this);
+		poolManager.execute(fetcher);
+	}
+	
+	
+	//================================================================================
+	// Fetch Completion
+	//================================================================================
+	public void linkComplete(Page page, ArrayList<String> links, HashMap<String, Integer> fileMap) {
+		state.markUrlComplete(page);
+		page.accumulate(links, fileMap);
+		
+		for (String s : links) {
+			// If we're tracking this domain handle it
+			if (s.contains("." + domain)) {
+				FetchRequest req = new FetchRequest(page.domain, page.depth, page.urlString, new ArrayList<String>());
+				publishLink(req);
+			}
+			
+			// Else, hand it off
+			else {
+				HandoffLookup handoff = new HandoffLookup(page.urlString, page.depth, page.urlString, new ArrayList<String>());
+				managerLink.sendData(handoff.marshall());
+			}
+		}
 		
 	}
 	
