@@ -27,11 +27,15 @@ public class Constants {
 	public static final int Failure = 99;
 	public static final int Success = 100;
 	
-	public static final int depth = 2;
+	public static final int depth = 1;
 	
 	
 	// Message sizes
 	public static final int LEN_BYTES = 3072;
 	
+	// Domains
 	public static final List<String> domains = Arrays.asList("bmb.colostate.edu", "biology.colostate.edu", "chm.colostate.edu", "cs.colostate.edu", "math.colostate.edu", "physics.colostate.edu", "colostate.edu/Depts/Psychology", "stat.colostate.edu");
+	
+	// File basepath
+	public static final String base_path = "/tmp/evansl/crawlData/";
 }

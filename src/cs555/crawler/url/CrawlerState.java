@@ -5,6 +5,8 @@ import java.io.DataInputStream;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import cs555.crawler.utilities.*;
 
@@ -68,6 +70,10 @@ public class CrawlerState {
 
 		System.out.println("url : " + url);
 		System.out.println("domain : " + domain);
+		
+		if (url.endsWith("/")) {
+			url = url.substring(0, url.length()-1);
+		}
 		
 		Page p = new Page(url, 0, domain);
 		addPage(p);
@@ -194,12 +200,14 @@ public class CrawlerState {
 
 		for (Page u : readyList){
 			if (url.equals(u)){
+				//System.out.println("In ready");
 				return true;
 			}
 		}
 		
 		for (Page u : pendingList){
 			if (url.equals(u)){
+				//System.out.println("in pending");
 				return true;
 			}
 		}
@@ -237,4 +245,39 @@ public class CrawlerState {
 		return s;
 	}
 	
+	public String diagnostics() {
+		String s = "";
+		HashMap<String, Integer> files = new HashMap<String, Integer>();
+		
+		s += "Crawled links : " + doneList.size() + "\n";
+		
+		for (Page p : doneList) {
+			
+			for (Map.Entry<String,Integer> entry : p.metaData.fileMap.entrySet()) {
+				String format = entry.getKey();
+				int count = entry.getValue();
+
+				if (files.containsKey(format)) {
+					int curr = files.get(format);
+					files.put(format, curr + count);
+				}
+				
+				else {
+					files.put(format, count);
+				}
+			}
+		}
+		
+		s += "Files : \n";
+		
+		for (Map.Entry<String,Integer> entry : files.entrySet()) {
+			String format = entry.getKey();
+			int count = entry.getValue();
+
+			s += format + " = " + count + "\n";
+		}
+		
+		
+		return s;
+	}
 }

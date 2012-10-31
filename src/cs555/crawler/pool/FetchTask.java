@@ -1,25 +1,26 @@
 package cs555.crawler.pool;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-//import org.htmlparser.beans.*;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 import cs555.crawler.node.Worker;
 import cs555.crawler.url.Page;
 import cs555.crawler.utilities.Constants;
 import cs555.crawler.wireformats.FetchRequest;
 
-public class FetchParseTask implements Task {
+public class FetchTask implements Task {
 
 	int runningThread;
 
-	// Fetchers
-//	HTMLTextBean textfetcher;
-//	LinkBean linkfetcher;
 
 	// URL
 	String urlString;
@@ -29,7 +30,7 @@ public class FetchParseTask implements Task {
 
 	// Request 
 	FetchRequest request;
-	
+
 	Worker node;
 	Page page;
 
@@ -37,15 +38,10 @@ public class FetchParseTask implements Task {
 	//================================================================================
 	// Constructor
 	//================================================================================
-	public FetchParseTask(Page p, FetchRequest urlReq, Worker w){
-//		textfetcher = new HTMLTextBean();
-//		linkfetcher = new LinkBean();
-//		urlString = urlReq.url;
-//		request = urlReq;
-//
-//		textfetcher.setURL(urlString);
-//		linkfetcher.setURL(urlString);
-		
+	public FetchTask(Page p, FetchRequest urlReq, Worker w){
+		urlString = urlReq.url;
+		request = urlReq;
+
 		node = w;
 		page = p;
 	}
@@ -55,48 +51,41 @@ public class FetchParseTask implements Task {
 	//================================================================================
 	public void run() {
 
-//		try {
-//			// URL
-//			URL url = new URL(urlString);
-//			
-//			// URL connections
-//			URLConnection linkURLConnection;
-//			linkURLConnection = url.openConnection();
-//
-//			URLConnection textURLConnection;
-//			textURLConnection = url.openConnection();
-//			
-//			linkfetcher.setConnection(linkURLConnection);
-//			textfetcher.setConnection(textURLConnection);
-//
-//			URL [] urls = linkfetcher.getLinks();
-//			//String webString = textfetcher.getText();	
-//			
-//			ArrayList<String> freshLinks = removeBadDomains(stringURLs(urls));
-//			
-////			for (String s : freshLinks) {
-////				System.out.println(s);
-////			}
-//			
-//			node.linkComplete(page, freshLinks, getFileMap(urls));
-//			
-//			// Save webString to file in basePath + /url
-//			//System.out.println(webString);
-//			
-//		} catch (IOException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//			return;
-//		}
-//
-//		return;
+		try {
+
+			ArrayList<String> urls = new ArrayList<String>();
+
+			Document doc = Jsoup.connect(urlString).timeout(6000).get();
+
+			Elements links = doc.select("a[href]");
+			String text = doc.body().text();
+
+			for (Element link : links) {
+				urls.add(link.attr("abs:href"));
+			}
+
+			ArrayList<String> freshLinks = removeBadDomains(urls);
+			node.linkComplete(page, freshLinks, getFileMap(urls));
+			
+			SaveTask saver = new SaveTask(urlString, text);
+			saver.save();
+
+
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			//e.printStackTrace();
+			node.linkErrored(page);
+			return;
+		}
+
+		return;
 	}
 
 
 	//================================================================================
 	// Parse
 	//================================================================================
-	public HashMap<String, Integer> getFileMap(URL[] links) {
+	public HashMap<String, Integer> getFileMap(ArrayList<String> links) {
 		int html = 0;
 		int htm = 0;
 		int doc = 0;
@@ -105,10 +94,9 @@ public class FetchParseTask implements Task {
 		int aspx = 0;
 		int asp = 0;
 		int php = 0;
-		
-		for (URL u : links) {
-			String s = u.toString();
-			
+
+		for (String s : links) {
+
 			if (s.endsWith(".html")) html++;
 			else if (s.endsWith(".htm")) htm++;
 			else if (s.endsWith(".doc")) doc++;
@@ -118,10 +106,10 @@ public class FetchParseTask implements Task {
 			else if (s.endsWith(".asp")) asp++;
 			else if (s.endsWith(".php")) php++;
 		}
-		
-		
+
+
 		HashMap<String, Integer> fileMap = new HashMap<String, Integer>();
-		
+
 		fileMap.put("html", html);
 		fileMap.put("htm", htm);
 		fileMap.put("doc", doc);
@@ -129,25 +117,25 @@ public class FetchParseTask implements Task {
 		fileMap.put("cfm", cfm);
 		fileMap.put("aspx", aspx);
 		fileMap.put("asp", asp);
-		fileMap.put("phpl", php);
-		
-		
+		fileMap.put("php", php);
+
+
 		return fileMap;
 	}
 
 	public ArrayList<String> stringURLs(URL[] urls) {
 		ArrayList<String> strings = new ArrayList<String>();
-		
+
 		for (URL u : urls) {
 			strings.add(u.toString());
 		}
-		
+
 		return strings;
 	}
 
 	public ArrayList<String> removeBadDomains(ArrayList<String> original) {
 		ArrayList<String> newList = new ArrayList<String>();
-		
+
 		for (String s : original) {
 			for (String d : Constants.domains) {
 				if (s.contains("." + d)) {
@@ -156,14 +144,14 @@ public class FetchParseTask implements Task {
 				}
 			}
 		}
-		
+
 		return newList;
 	}
-	
+
 	@Override
 	public void setRunning(int i) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 

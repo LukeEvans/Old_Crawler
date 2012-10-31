@@ -1,40 +1,53 @@
 package cs555.crawler.pool;
 
-public class SaveTask implements Task{
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 
-	int runningThread;
-	
+import cs555.crawler.utilities.Constants;
+
+public class SaveTask {
+
+
 	String urlString;
 	String fileString;
-	
+
 	//================================================================================
 	// Constructor
 	//================================================================================
-	public SaveTask(String url, String file){
+	public SaveTask(String url, String text){
 		urlString = url;
-		fileString = file;
+		fileString = text;
 	}
-	
-	
+
+
 	//================================================================================
 	// Run
 	//================================================================================
-	public void run() {
-		
+	public void save() {
+		String filename = getFilename();
+
+		FileWriter fstream;
+		try {
+			fstream = new FileWriter(filename);
+			BufferedWriter out = new BufferedWriter(fstream);
+			out.write(fileString);
+			//Close the output stream
+			out.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 	}
 
-	
 	//================================================================================
-	// Save
+	// Linter
 	//================================================================================
-	
-	
-	
-	//================================================================================
-	// House Keeping
-	//================================================================================
-	public void setRunning(int i) {
-		runningThread = i;
+	public String getFilename() {
+		String url = urlString.replace("/", "-_-");
+		return Constants.base_path + url;
 	}
+
 
 }

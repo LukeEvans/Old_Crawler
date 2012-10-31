@@ -12,7 +12,7 @@ public class Page {
 	public String urlString;
 	public int depth;
 	public String domain;
-	PageMetadata metaData;
+	public PageMetadata metaData;
 	
 	//================================================================================
 	// Constructor

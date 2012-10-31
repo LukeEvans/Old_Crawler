@@ -18,7 +18,6 @@ import cs555.crawler.pool.*;
 public class Worker extends Node{
 
 	Peer nodeManager;
-	Link managerLink;
 	ThreadPoolManager poolManager;
 	String domain;
 	CrawlerState state;
@@ -29,7 +28,7 @@ public class Worker extends Node{
 	public Worker(int port,int threads){
 		super(port);
 		nodeManager = null;
-		managerLink = null;
+
 		poolManager = new ThreadPoolManager(threads);
 		domain = new String();
 		state = new CrawlerState();
@@ -57,7 +56,6 @@ public class Worker extends Node{
 			l.sendData(electionReply.marshall());
 
 			nodeManager = new Peer(election.host, election.port);
-			managerLink = connect(nodeManager);
 			domain = election.domain;
 
 			System.out.println("Elected Official: " + election);
@@ -92,7 +90,7 @@ public class Worker extends Node{
 
 		// Return if we're already at our max depth
 		if (request.depth == Constants.depth) {
-			System.out.println("Depth is at : " + request.depth);
+			//System.out.println("Depth is at : " + request.depth);
 			return;
 		}
 
@@ -101,7 +99,6 @@ public class Worker extends Node{
 
 			if (state.addPage(page)) {
 				state.makrUrlPending(page);
-				System.out.println("Added page");
 				fetchURL(page, request);
 			}
 			
@@ -111,7 +108,8 @@ public class Worker extends Node{
 
 	public void fetchURL(Page page, FetchRequest request) {
 		System.out.println("Fetching : " + request.url);
-		FetchParseTask fetcher = new FetchParseTask(page, request, this);
+		FetchTask fetcher = new FetchTask(page, request, this);
+		//FetchParseTask fetcher = new FetchParseTask(page, request, this);
 		poolManager.execute(fetcher);
 	}
 
@@ -121,32 +119,61 @@ public class Worker extends Node{
 	//================================================================================
 	public void linkComplete(Page page, ArrayList<String> links, HashMap<String, Integer> fileMap) {
 		System.out.println("Link complete : " + page.urlString);
-		state.markUrlComplete(page);
-		page.accumulate(links, fileMap);
+		
+		synchronized (state) {
+			state.findPendingUrl(page).accumulate(links, fileMap);
+			state.markUrlComplete(page);
 
-		for (String s : links) {
-			// If we're tracking this domain handle it
-			if (s.contains("." + domain)) {
-				System.out.println("Mine " + s);
-				FetchRequest req = new FetchRequest(page.domain, page.depth + 1, page.urlString, new ArrayList<String>());
-				publishLink(req);
+			for (String s : links) {
+				// If we're tracking this domain handle it
+				if (s.contains("." + domain)) {
+					//System.out.println("Mine " + s);
+					FetchRequest req = new FetchRequest(page.domain, page.depth + 1, s, new ArrayList<String>());
+					publishLink(req);
+				}
+
+				// Else, hand it off
+				else {
+					Link managerLink = connect(nodeManager);
+					
+					//System.out.println("Does not contain my domain : " + domain + " =? " + s);
+					HandoffLookup handoff = new HandoffLookup(s, page.depth + 1, s, new ArrayList<String>());
+					managerLink.sendData(handoff.marshall());
+
+					managerLink.close();
+				}
 			}
 
-			// Else, hand it off
-			else {
-				System.out.println("Does not contain my domain : " + domain + " =? " + s);
-				HandoffLookup handoff = new HandoffLookup(s, page.depth + 1, s, new ArrayList<String>());
-				managerLink.sendData(handoff.marshall());
-			}
-		}
-
-		// If we're done, print
-		if (!state.shouldContinue()) {
-			System.out.println("Complete! Print data now");
+			// If we're done, print
+			if (!state.shouldContinue()) {
+				printDomainInfo();
+			}	
 		}
 
 	}
+	
+	public void linkErrored(Page page) {
+		System.out.println("Error on page : " + page.urlString);
+		
+		synchronized (state) {
+			state.markUrlComplete(page);
+			
+			// If we're done, print
+			if (!state.shouldContinue()) {
+				printDomainInfo();
+			}
+		}
+	}
 
+	//================================================================================
+	// Printing
+	//================================================================================
+	public void printDomainInfo() {
+		System.out.println("\n================================================================================");
+		System.out.println("Diagnostics for domain : " + domain);
+		System.out.println(state.diagnostics());
+		System.out.println("================================================================================\n");
+	}
 	//================================================================================
 	//================================================================================
 	// Main
