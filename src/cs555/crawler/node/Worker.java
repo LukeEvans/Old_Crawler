@@ -150,6 +150,9 @@ public class Worker extends Node{
 			printDomainInfo();
 		}	
 
+		else {
+			
+		}
 
 	}
 
@@ -162,6 +165,10 @@ public class Worker extends Node{
 			// If we're done, print
 			if (!state.shouldContinue()) {
 				printDomainInfo();
+			}
+			
+			else {
+				System.out.println(state.remaining());
 			}
 		}
 	}
