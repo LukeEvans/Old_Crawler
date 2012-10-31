@@ -90,7 +90,7 @@ public class Worker extends Node{
 
 		// Return if we're already at our max depth
 		if (request.depth == Constants.depth) {
-			//System.out.println("Depth is at : " + request.depth);
+			System.out.println("Depth is at : " + request.depth);
 			return;
 		}
 
