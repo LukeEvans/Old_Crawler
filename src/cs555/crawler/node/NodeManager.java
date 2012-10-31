@@ -1,5 +1,7 @@
 package cs555.crawler.node;
 
+import java.util.ArrayList;
+
 import cs555.crawler.communications.Link;
 import cs555.crawler.peer.Peer;
 import cs555.crawler.peer.PeerList;
@@ -10,6 +12,7 @@ import cs555.crawler.utilities.Tools;
 import cs555.crawler.wireformats.ElectionMessage;
 import cs555.crawler.wireformats.FetchRequest;
 import cs555.crawler.wireformats.FetchResponse;
+import cs555.crawler.wireformats.HandoffLookup;
 
 public class NodeManager extends Node{
 	
@@ -23,14 +26,14 @@ public class NodeManager extends Node{
 	//================================================================================
 	// Constructor
 	//================================================================================
-	public NodeManager(CrawlerState s, PeerList list, int port,String lf, String sf, int md){
+	public NodeManager(CrawlerState s, PeerList list, int port,String lf, String sf){
 		super(port);
 		
 		peerList = list;
 		state = s;
 		linkFile = lf;
 		slaveFile = sf;
-		maxDepth = md;
+		maxDepth = Constants.depth;
 		
 	}
 	
@@ -58,8 +61,14 @@ public class NodeManager extends Node{
 	// Send
 	//================================================================================
 	public void broadcastElection(){
-		ElectionMessage electionMsg = new ElectionMessage(serverPort, Tools.getLocalHostname());
-		broadcastMessage(peerList.getAllPeers(), electionMsg.marshall(),Constants.Election_Message);
+		
+		for (Page page : state.getAllPages()) {
+			Peer peer = peerList.getReadyPeer();
+			peer.setDomain(page.domain);
+			
+			ElectionMessage electionMsg = new ElectionMessage(serverPort, Tools.getLocalHostname(), page.domain, page.urlString);
+			sendBytes(peer, electionMsg.marshall());
+		}
 	}
 
 	
@@ -80,6 +89,20 @@ public class NodeManager extends Node{
 			
 			break;
 
+		case Constants.Handoff_Lookup:
+			
+			HandoffLookup lookup = new HandoffLookup();
+			lookup.unmarshall(bytes);
+			
+			Peer leader = peerList.findDomainLeader(lookup.url);
+			
+			if (leader != null) {
+				FetchRequest handoff = new FetchRequest(leader.domain, lookup.depth, lookup.url, new ArrayList<String>());
+				sendBytes(leader, handoff.marshall());
+			}
+			
+			break;
+			
 		default:
 			
 			System.out.println("Unrecognized Message");
@@ -96,7 +119,6 @@ public class NodeManager extends Node{
 	public static void main(String[] args){
 
 		int port = 0;
-		int maxDepth = 5;
 		String linkFile = "";
 		String slaveFile = "";
 
@@ -106,32 +128,22 @@ public class NodeManager extends Node{
 			slaveFile = args[2];
 		}
 
-		else if (args.length == 4){
-			port = Integer.parseInt(args[0]);
-			linkFile = args[1];
-			slaveFile = args[2];
-			maxDepth = Integer.parseInt(args[3]);
-		}
 
 		else {
-			System.out.println("Usage: java node.NodeManager PORT LINK-FILE SLAVE-FILE <DEPTH>");
+			System.out.println("Usage: java node.NodeManager PORT LINK-FILE SLAVE-FILE");
 			System.exit(1);
 		}
 
 		// Create peer list
 		PeerList peerList = new PeerList(slaveFile, port);
-		CrawlerState state = new CrawlerState(linkFile,maxDepth);
+		CrawlerState state = new CrawlerState(linkFile);
 
 		// Create node
-		NodeManager manager = new  NodeManager(state, peerList, port, linkFile, slaveFile, maxDepth);
+		NodeManager manager = new  NodeManager(state, peerList, port, linkFile, slaveFile);
 		manager.initServer();
 		
 		// Broadcast our election message
 		manager.broadcastElection();
 		
-		// If we should continue, continue
-//		while (manager.shouldContinue()){
-			manager.beginRound();
-//		}
 	}
 }

@@ -13,15 +13,29 @@ public class ElectionMessage {
 	public int hostLength; // 4
 	public String host; // hostLength
 	
+	public int domainLen; // 4
+	public String domain; // domainLen
+	
+	public int urlLen; // 4
+	public String url; // urlLen
+	
 	//================================================================================
 	// Overridden Constructors
 	//================================================================================
-	public ElectionMessage(int p, String h){
+	public ElectionMessage(int p, String h, String d, String u){
 		hostLength = h.length();
 		host = h;
 		port = p;
-		size = 4 + 4 + 4 + hostLength;
+		
+		domainLen = d.length();
+		domain = d;
+		
+		urlLen = u.length();
+		url = u;
+			
 		type = Constants.Election_Message;
+		
+		size = 4 + 4 + 4 + hostLength + 4 + domainLen + 4 + urlLen;
 	}
 	
 	public ElectionMessage(){
@@ -52,6 +66,14 @@ public class ElectionMessage {
 		bbuff.putInt(hostLength);
 		bbuff.put(Tools.convertToBytes(host));
 		
+		// Domain
+		bbuff.putInt(domainLen);
+		bbuff.put(Tools.convertToBytes(domain));
+		
+		// Url
+		bbuff.putInt(urlLen);
+		bbuff.put(Tools.convertToBytes(url));
+		
 		return bytes;
 	}
 	
@@ -77,6 +99,17 @@ public class ElectionMessage {
 		bbuff.get(hostBytes);
 		host = new String(hostBytes,0,hostLength);
 		
+		// Domain
+		domainLen = bbuff.getInt();
+		byte[] dBytes = new byte[domainLen];
+		bbuff.get(dBytes);
+		domain = new String(dBytes,0,domainLen);
+		
+		// Url
+		urlLen = bbuff.getInt();
+		byte[] uBytes = new byte[urlLen];
+		bbuff.get(uBytes);
+		url = new String(uBytes,0,urlLen);
 	}
 	
 	//================================================================================
@@ -86,6 +119,7 @@ public class ElectionMessage {
 		String s = "";
 		
 		s += "NodeManager: " + host + ":" + port + "\n";
+		s += "Domain: " + domain + " Url: " + url + "\n";
 		
 		return s;
 	}

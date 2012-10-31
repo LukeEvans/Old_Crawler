@@ -1,6 +1,8 @@
 package cs555.crawler.node;
 
 import cs555.crawler.communications.Link;
+import cs555.crawler.url.CrawlerState;
+import cs555.crawler.url.Page;
 import cs555.crawler.utilities.Constants;
 import cs555.crawler.utilities.Tools;
 import cs555.crawler.wireformats.ElectionMessage;
@@ -12,7 +14,10 @@ import cs555.crawler.pool.*;
 public class Worker extends Node{
 
 	Peer nodeManager;
+	Link managerLink;
 	ThreadPoolManager poolManager;
+	String domain;
+	CrawlerState state;
 
 	//================================================================================
 	// Constructor
@@ -20,7 +25,10 @@ public class Worker extends Node{
 	public Worker(int port,int threads){
 		super(port);
 		nodeManager = null;
+		managerLink = null;
 		poolManager = new ThreadPoolManager(threads);
+		domain = new String();
+		state = new CrawlerState();
 	}
 
 
@@ -28,6 +36,7 @@ public class Worker extends Node{
 		super.initServer();
 		poolManager.start();
 	}
+	
 	//================================================================================
 	// Receive
 	//================================================================================
@@ -44,6 +53,8 @@ public class Worker extends Node{
 			l.sendData(electionReply.marshall());
 			
 			nodeManager = new Peer(election.host, election.port);
+			managerLink = connect(nodeManager);
+			domain = election.domain;
 			
 			System.out.println("Elected Official: " + election);
 			
@@ -55,19 +66,40 @@ public class Worker extends Node{
 			
 			System.out.println("Got: \n" + request);
 			
-			FetchParseTask task = new FetchParseTask(connect(nodeManager), request.url, request);
+			FetchParseTask task = new FetchParseTask(managerLink, request.url, request);
 			poolManager.execute(task);
 			
 			break;
 			
 		default:
-
 			System.out.println("Unrecognized Message");
 			break;
 		}
 	}
 
-
+	//================================================================================
+	// Add links to crawl
+	//================================================================================
+	public void publishLink(FetchRequest request) {
+		
+		// Return if we're already at our max depth
+		if (request.depth == Constants.depth) {
+			return;
+		}
+		
+		synchronized (state) {
+			Page page = new Page(request.url, request.depth, request.domain);
+			state.addPage(page);
+			state.makrUrlPending(page);
+			fetchURL(request);
+		}
+	}
+	
+	
+	public void fetchURL(FetchRequest request) {
+		
+	}
+	
 	//================================================================================
 	//================================================================================
 	// Main

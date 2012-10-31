@@ -124,6 +124,18 @@ public class PeerList {
 		return listOfPeers.get(peerIndex);
 	}
 
+	public Peer getReadyPeer() {
+		
+		Peer p = getNextPeer();
+		
+		while (!p.ready) {
+			p = getNextPeer();
+		}
+		
+		p.ready = false;
+		
+		return p;
+	}
 	
 	// Get first peer
 	public Peer getFirstPeer(){
@@ -142,6 +154,20 @@ public class PeerList {
 	public int size(){
 		return listOfPeers.size();
 	}
+	
+	// Get peer for a domain
+	public Peer findDomainLeader(String d) {
+		for (Peer p : listOfPeers) {
+			if (p.domain != null) {
+				if (d.contains("." + p.domain)) {
+					return p;
+				}
+			}
+		}
+		
+		return null;
+	}
+	
 	//================================================================================
 	// House Keeping
 	//================================================================================

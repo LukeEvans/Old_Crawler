@@ -1,5 +1,9 @@
 package cs555.crawler.utilities;
 
+import java.util.Arrays;
+import java.util.List;
+
+
 // Constants for message types
 public class Constants {
 
@@ -11,6 +15,8 @@ public class Constants {
 	public static final int Election_Message = 5;
 	public static final int Fetch_Request = 6;
 	public static final int Fetch_Response = 7;
+	public static final int Handoff_Lookup = 8;
+	public static final int Handoff_Reply = 9;
 	
 	// URL states
 	public static final int URL_Ready = 5;
@@ -21,6 +27,11 @@ public class Constants {
 	public static final int Failure = 99;
 	public static final int Success = 100;
 	
+	public static final int depth = 1;
+	
+	
 	// Message sizes
 	public static final int LEN_BYTES = 3072;
+	
+	public static final List<String> domains = Arrays.asList("bmb.colostate.edu", "biology.colostate.edu", "chm.colostate.edu", "cs.colostate.edu", "math.colostate.edu", "physics.colostate.edu", "colostate.edu/Depts/Psychology", "stat.colostate.edu");
 }

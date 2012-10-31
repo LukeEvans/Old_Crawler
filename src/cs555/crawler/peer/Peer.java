@@ -5,13 +5,27 @@ public class Peer {
 
 	public String hostname;
 	public int port;
+	public String domain;
+	public boolean ready;
 
+	//================================================================================
 	// Constructor
+	//================================================================================
 	public Peer(String host, int p) {
 		hostname = host;
 		port = p;
+		domain = new String();
+		ready = true;
 	}
 
+	
+	//================================================================================
+	// Domain Tracking
+	//================================================================================
+	public void setDomain(String d) {
+		domain = new String(d);
+	}
+	
 	//================================================================================
 	// House Keeping
 	//================================================================================
@@ -27,6 +41,7 @@ public class Peer {
 		return false;
 	}
 
+	
 	// Override .toString method
 	public String toString() {
 		String s = "";
