@@ -118,7 +118,7 @@ public class Worker extends Node{
 	// Fetch Completion
 	//================================================================================
 	public void linkComplete(Page page, ArrayList<String> links, HashMap<String, Integer> fileMap) {
-		//System.out.println("Link complete : " + page.urlString);
+		System.out.println("Link complete : " + page.urlString);
 
 		synchronized (state) {
 			state.findPendingUrl(page).accumulate(links, fileMap);
