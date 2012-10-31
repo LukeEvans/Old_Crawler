@@ -280,4 +280,11 @@ public class CrawlerState {
 		
 		return s;
 	}
+	
+	public String remaining() {
+		String s = "Ready Remaining : " + readyList.size() + "\n";
+		s += "Pending Remainaing : " + pendingList.size();
+		
+		return s;
+	}
 }
