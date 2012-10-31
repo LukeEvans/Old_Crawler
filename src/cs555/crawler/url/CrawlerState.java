@@ -111,13 +111,16 @@ public class CrawlerState {
 	// List manipulation 
 	//================================================================================
 	// Add peer
-	public void addPage(Page u){
+	public boolean addPage(Page u){
 		if (!contains(u)){
 			if (u.depth < maxDepth){
 				readyList.add(u);
+				return true;
 			}
 			
 		}
+		
+		return false;
 	}
 	
 	public Page findPendingUrl(Page u){
@@ -165,13 +168,24 @@ public class CrawlerState {
 	// Completion methods 
 	//================================================================================
 	public boolean shouldContinue(){
-		return readyLinksRemaining();
+		if (readyLinksRemaining()) {
+			return true;
+		}
+		
+		if (pendingLinksRemaining()) {
+			return true;
+		}
+		
+		return false;
 	}
 	
 	public boolean readyLinksRemaining(){
 		return !readyList.isEmpty();
 	}
 	
+	public boolean pendingLinksRemaining(){
+		return !pendingList.isEmpty();
+	}
 	//================================================================================
 	// House Keeping
 	//================================================================================

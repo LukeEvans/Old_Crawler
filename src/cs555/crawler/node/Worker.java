@@ -40,7 +40,7 @@ public class Worker extends Node{
 		super.initServer();
 		poolManager.start();
 	}
-	
+
 	//================================================================================
 	// Receive
 	//================================================================================
@@ -52,82 +52,101 @@ public class Worker extends Node{
 		case Constants.Election_Message:
 			ElectionMessage election = new ElectionMessage();
 			election.unmarshall(bytes);
-			
+
 			Verification electionReply = new Verification(election.type);
 			l.sendData(electionReply.marshall());
-			
+
 			nodeManager = new Peer(election.host, election.port);
 			managerLink = connect(nodeManager);
 			domain = election.domain;
-			
+
 			System.out.println("Elected Official: " + election);
-			
+
+			FetchRequest domainReq = new FetchRequest(election.domain, 0, election.url, new ArrayList<String>());
+			publishLink(domainReq);
+
 			break;
 
 		case Constants.Fetch_Request:
 			FetchRequest request = new FetchRequest();
 			request.unmarshall(bytes);
-			
+
 			System.out.println("Got: \n" + request);
-			
+
 			publishLink(request);
-			
+
 			break;
-			
+
 		default:
 			System.out.println("Unrecognized Message");
 			break;
 		}
+		
+		l.close();
 	}
 
 	//================================================================================
 	// Add links to crawl
 	//================================================================================
 	public void publishLink(FetchRequest request) {
-		
+
 		// Return if we're already at our max depth
 		if (request.depth == Constants.depth) {
+			System.out.println("Depth is at : " + request.depth);
 			return;
 		}
-		
+
 		synchronized (state) {
 			Page page = new Page(request.url, request.depth, request.domain);
-			state.addPage(page);
-			state.makrUrlPending(page);
-			fetchURL(page, request);
+
+			if (state.addPage(page)) {
+				state.makrUrlPending(page);
+				System.out.println("Added page");
+				fetchURL(page, request);
+			}
+			
 		}
 	}
-	
-	
+
+
 	public void fetchURL(Page page, FetchRequest request) {
+		System.out.println("Fetching : " + request.url);
 		FetchParseTask fetcher = new FetchParseTask(page, request, this);
 		poolManager.execute(fetcher);
 	}
-	
-	
+
+
 	//================================================================================
 	// Fetch Completion
 	//================================================================================
 	public void linkComplete(Page page, ArrayList<String> links, HashMap<String, Integer> fileMap) {
+		System.out.println("Link complete : " + page.urlString);
 		state.markUrlComplete(page);
 		page.accumulate(links, fileMap);
-		
+
 		for (String s : links) {
 			// If we're tracking this domain handle it
 			if (s.contains("." + domain)) {
-				FetchRequest req = new FetchRequest(page.domain, page.depth, page.urlString, new ArrayList<String>());
+				System.out.println("Mine " + s);
+				FetchRequest req = new FetchRequest(page.domain, page.depth + 1, page.urlString, new ArrayList<String>());
 				publishLink(req);
 			}
-			
+
 			// Else, hand it off
 			else {
-				HandoffLookup handoff = new HandoffLookup(page.urlString, page.depth, page.urlString, new ArrayList<String>());
+				System.out.println("Does not contain my domain : " + domain + " =? " + s);
+				HandoffLookup handoff = new HandoffLookup(s, page.depth + 1, s, new ArrayList<String>());
 				managerLink.sendData(handoff.marshall());
 			}
 		}
-		
+
+		// If we're done, print
+		if (!state.shouldContinue()) {
+			System.out.println("Complete! Print data now");
+		}
+
 	}
-	
+
 	//================================================================================
 	//================================================================================
 	// Main
@@ -137,7 +156,7 @@ public class Worker extends Node{
 
 		int port = 0;
 		int threads = 5;
-		
+
 		if (args.length == 1) {
 			port = Integer.parseInt(args[0]);
 		}

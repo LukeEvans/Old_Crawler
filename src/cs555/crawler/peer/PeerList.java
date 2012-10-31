@@ -160,6 +160,7 @@ public class PeerList {
 		for (Peer p : listOfPeers) {
 			if (p.domain != null) {
 				if (d.contains("." + p.domain)) {
+					System.out.println(d + " " + p.domain);
 					return p;
 				}
 			}

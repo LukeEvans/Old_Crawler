@@ -70,9 +70,15 @@ public class FetchParseTask implements Task {
 			textfetcher.setConnection(textURLConnection);
 
 			URL [] urls = linkfetcher.getLinks();
-			String webString = textfetcher.getText();	
+			//String webString = textfetcher.getText();	
 			
+			ArrayList<String> freshLinks = removeBadDomains(stringURLs(urls));
 			
+//			for (String s : freshLinks) {
+//				System.out.println(s);
+//			}
+			
+			node.linkComplete(page, freshLinks, getFileMap(urls));
 			
 			// Save webString to file in basePath + /url
 			//System.out.println(webString);
