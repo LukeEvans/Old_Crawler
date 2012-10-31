@@ -95,7 +95,7 @@ public class NodeManager extends Node{
 			HandoffLookup lookup = new HandoffLookup();
 			lookup.unmarshall(bytes);
 			
-			System.out.println("Got lookup req " + lookup.url);
+			//System.out.println("Got lookup req " + lookup.url);
 			Peer leader = peerList.findDomainLeader(lookup.url);
 			
 			if (leader != null) {

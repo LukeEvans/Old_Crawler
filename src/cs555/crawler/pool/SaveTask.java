@@ -45,7 +45,7 @@ public class SaveTask {
 	// Linter
 	//================================================================================
 	public String getFilename() {
-		String url = urlString.replace("/", "-_-");
+		String url = urlString.replace("/", "\\");
 		return Constants.base_path + url;
 	}
 

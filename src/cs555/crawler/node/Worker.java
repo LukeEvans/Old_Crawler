@@ -79,7 +79,7 @@ public class Worker extends Node{
 			System.out.println("Unrecognized Message");
 			break;
 		}
-		
+
 		l.close();
 	}
 
@@ -101,13 +101,13 @@ public class Worker extends Node{
 				state.makrUrlPending(page);
 				fetchURL(page, request);
 			}
-			
+
 		}
 	}
 
 
 	public void fetchURL(Page page, FetchRequest request) {
-		System.out.println("Fetching : " + request.url);
+		//System.out.println("Fetching : " + request.url);
 		FetchTask fetcher = new FetchTask(page, request, this);
 		//FetchParseTask fetcher = new FetchParseTask(page, request, this);
 		poolManager.execute(fetcher);
@@ -118,46 +118,47 @@ public class Worker extends Node{
 	// Fetch Completion
 	//================================================================================
 	public void linkComplete(Page page, ArrayList<String> links, HashMap<String, Integer> fileMap) {
-		System.out.println("Link complete : " + page.urlString);
-		
+		//System.out.println("Link complete : " + page.urlString);
+
 		synchronized (state) {
 			state.findPendingUrl(page).accumulate(links, fileMap);
 			state.markUrlComplete(page);
-
-			for (String s : links) {
-				// If we're tracking this domain handle it
-				if (s.contains("." + domain)) {
-					//System.out.println("Mine " + s);
-					FetchRequest req = new FetchRequest(page.domain, page.depth + 1, s, new ArrayList<String>());
-					publishLink(req);
-				}
-
-				// Else, hand it off
-				else {
-					Link managerLink = connect(nodeManager);
-					
-					//System.out.println("Does not contain my domain : " + domain + " =? " + s);
-					HandoffLookup handoff = new HandoffLookup(s, page.depth + 1, s, new ArrayList<String>());
-					managerLink.sendData(handoff.marshall());
-
-					managerLink.close();
-				}
-			}
-
-			// If we're done, print
-			if (!state.shouldContinue()) {
-				printDomainInfo();
-			}	
 		}
 
+		for (String s : links) {
+			// If we're tracking this domain handle it
+			if (s.contains("." + domain)) {
+				//System.out.println("Mine " + s);
+				FetchRequest req = new FetchRequest(page.domain, page.depth + 1, s, new ArrayList<String>());
+				publishLink(req);
+			}
+
+			// Else, hand it off
+			else {
+				Link managerLink = connect(nodeManager);
+
+				//System.out.println("Does not contain my domain : " + domain + " =? " + s);
+				HandoffLookup handoff = new HandoffLookup(s, page.depth + 1, s, new ArrayList<String>());
+				managerLink.sendData(handoff.marshall());
+
+				managerLink.close();
+			}
+		}
+
+		// If we're done, print
+		if (!state.shouldContinue()) {
+			printDomainInfo();
+		}	
+
+
 	}
-	
+
 	public void linkErrored(Page page) {
 		System.out.println("Error on page : " + page.urlString);
-		
+
 		synchronized (state) {
 			state.markUrlComplete(page);
-			
+
 			// If we're done, print
 			if (!state.shouldContinue()) {
 				printDomainInfo();

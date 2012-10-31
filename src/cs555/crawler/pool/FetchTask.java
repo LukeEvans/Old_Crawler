@@ -1,11 +1,11 @@
 package cs555.crawler.pool;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -66,7 +66,7 @@ public class FetchTask implements Task {
 
 			ArrayList<String> freshLinks = removeBadDomains(urls);
 			node.linkComplete(page, freshLinks, getFileMap(urls));
-			
+
 			SaveTask saver = new SaveTask(urlString, text);
 			saver.save();
 
@@ -74,6 +74,7 @@ public class FetchTask implements Task {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			//e.printStackTrace();
+			System.out.println("Error : " + e);
 			node.linkErrored(page);
 			return;
 		}
@@ -139,13 +140,28 @@ public class FetchTask implements Task {
 		for (String s : original) {
 			for (String d : Constants.domains) {
 				if (s.contains("." + d)) {
-					newList.add(s);
-					continue;
+
+					if (!linkIsFile(s)) { 
+						newList.add(s);
+						continue;
+					}
 				}
 			}
 		}
 
 		return newList;
+	}
+
+	public boolean linkIsFile(String link) {
+		List<String> ext = Arrays.asList("doc", "pdf", "jpg", "png");
+
+		for (String e : ext) {
+			if (link.endsWith("." + e)) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	@Override
