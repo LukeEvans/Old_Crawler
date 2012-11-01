@@ -283,8 +283,13 @@ public class CrawlerState {
 	
 	public String remaining() {
 		String s = "Ready Remaining : " + readyList.size() + "\n";
-		s += "Pending Remainaing : " + pendingList.size();
+		s += "Pending Remainaing : " + pendingList.size() + "\n";
 		
+		if (pendingList.size() < 5) {
+			for (Page p : pendingList) {
+				s += p.urlString + " : " + p.depth + "\n";
+			}
+		}
 		return s;
 	}
 }

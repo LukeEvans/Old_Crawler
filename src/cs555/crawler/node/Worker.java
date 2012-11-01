@@ -96,7 +96,11 @@ public class Worker extends Node{
 
 		synchronized (state) {
 			Page page = new Page(request.url, request.depth, request.domain);
-
+			
+			if (request.url.contains("achter")) {
+				System.out.println(request.url);
+			}
+			
 			if (state.addPage(page)) {
 				state.makrUrlPending(page);
 				fetchURL(page, request);
@@ -107,7 +111,11 @@ public class Worker extends Node{
 
 
 	public void fetchURL(Page page, FetchRequest request) {
-		System.out.println("Fetching : " + request.url);
+		if (request.url.contains("achter")) {
+			System.out.println("Fetching: " + request.url);
+		}
+		
+		//System.out.println("Fetching : " + request.url);
 		FetchTask fetcher = new FetchTask(page, request, this);
 		//FetchParseTask fetcher = new FetchParseTask(page, request, this);
 		poolManager.execute(fetcher);
@@ -118,8 +126,12 @@ public class Worker extends Node{
 	// Fetch Completion
 	//================================================================================
 	public void linkComplete(Page page, ArrayList<String> links, HashMap<String, Integer> fileMap) {
-		System.out.println("Link complete : " + page.urlString);
+		//System.out.println("Link complete : " + page.urlString);
 
+		if (page.urlString.contains("achter")) {
+			System.out.println("Completed: " + page.urlString);
+		}
+		
 		synchronized (state) {
 			state.findPendingUrl(page).accumulate(links, fileMap);
 			state.markUrlComplete(page);
@@ -151,7 +163,7 @@ public class Worker extends Node{
 		}	
 
 		else {
-			
+			//System.out.println(state.remaining());
 		}
 
 	}
@@ -168,7 +180,7 @@ public class Worker extends Node{
 			}
 			
 			else {
-				System.out.println(state.remaining());
+				//System.out.println(state.remaining());
 			}
 		}
 	}

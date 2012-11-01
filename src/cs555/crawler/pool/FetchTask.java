@@ -56,10 +56,18 @@ public class FetchTask implements Task {
 			ArrayList<String> urls = new ArrayList<String>();
 
 			Document doc = Jsoup.connect(urlString).timeout(6000).get();
-
 			Elements links = doc.select("a[href]");
-			String text = doc.body().text();
-
+			
+			String text = "";
+			
+			if (doc.head() != null) {
+				text += doc.head().text() + "\n";
+			}
+			
+			if (doc.body() != null) {
+				text += doc.body().text();
+			}
+			
 			for (Element link : links) {
 				urls.add(link.attr("abs:href"));
 			}
@@ -74,7 +82,7 @@ public class FetchTask implements Task {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			//e.printStackTrace();
-			System.out.println("Error : " + e);
+			//System.out.println("Error : " + e);
 			node.linkErrored(page);
 			return;
 		}
