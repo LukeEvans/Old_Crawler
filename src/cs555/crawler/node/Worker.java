@@ -165,7 +165,7 @@ public class Worker extends Node{
 		System.out.println("Error on page : " + page.urlString);
 
 		synchronized (state) {
-			state.markUrlComplete(page);
+			state.markUrlError(page);
 
 			// If we're done, print
 			if (!state.shouldContinue()) {

@@ -15,6 +15,7 @@ public class CrawlerState {
 	ArrayList<Page> readyList;
 	ArrayList<Page> pendingList;
 	ArrayList<Page> doneList;
+	ArrayList<Page> errorList;
 	
 	String linkFile;
 	int maxDepth;
@@ -30,6 +31,7 @@ public class CrawlerState {
 		readyList = new ArrayList<Page>();
 		pendingList = new ArrayList<Page>();
 		doneList = new ArrayList<Page>();
+		errorList = new ArrayList<Page>();
 		maxDepth = Constants.depth;
 		numberOfCrawlers = 0;
 		
@@ -40,6 +42,7 @@ public class CrawlerState {
 		readyList = new ArrayList<Page>();
 		pendingList = new ArrayList<Page>();
 		doneList = new ArrayList<Page>();
+		errorList = new ArrayList<Page>();
 		maxDepth = Constants.depth;
 	}
 	
@@ -160,6 +163,16 @@ public class CrawlerState {
 			url.status = Constants.URL_Complete;
 			pendingList.remove(url);
 			doneList.add(url);
+		}
+	}
+	
+	public void markUrlError(Page u) {
+		Page url = findPendingUrl(u);
+		
+		if (url != null) {
+			url.status = Constants.URL_Error;
+			pendingList.remove(url);
+			errorList.add(url);
 		}
 	}
 	
