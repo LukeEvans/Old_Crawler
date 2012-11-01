@@ -163,7 +163,7 @@ public class Worker extends Node{
 	}
 
 	public void linkErrored(Page page) {
-		System.out.println("Error on page : " + page.urlString);
+		//System.out.println("Error on page : " + page.urlString);
 
 		synchronized (state) {
 			state.markUrlError(page);
