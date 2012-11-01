@@ -62,6 +62,7 @@ public class Node {
 	public void sendBytes(Peer p, byte[] bytes) {
 		Link link = connect(p);
 		link.sendData(bytes);
+		link.close();
 	}
 	
 	//================================================================================

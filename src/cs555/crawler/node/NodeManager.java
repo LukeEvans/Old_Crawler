@@ -139,6 +139,8 @@ public class NodeManager extends Node{
 			System.out.println("Unrecognized Message");
 			break;
 		}
+		
+		l.close();
 	}
 	
 	

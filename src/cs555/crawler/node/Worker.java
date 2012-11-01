@@ -59,8 +59,9 @@ public class Worker extends Node{
 			nodeManager = new Peer(election.host, election.port);
 			domain = election.domain;
 
-			System.out.println("Elected Official: " + election);
+			System.out.println(election);
 
+			System.out.println("Crawling...\n");
 			FetchRequest domainReq = new FetchRequest(election.domain, 0, election.url, new ArrayList<String>());
 			publishLink(domainReq);
 

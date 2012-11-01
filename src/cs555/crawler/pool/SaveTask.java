@@ -36,7 +36,7 @@ public class SaveTask {
 			out.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			System.out.println("Error Saving file: " + urlString);
+			System.out.println("Error Saving file: file name is too long");
 		}
 
 	}
