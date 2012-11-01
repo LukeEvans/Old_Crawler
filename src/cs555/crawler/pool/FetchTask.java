@@ -113,6 +113,11 @@ public class FetchTask implements Task {
 		int txt = 0;
 		int text = 0;
 		int pptx = 0;
+		int pps = 0;
+		int wmv = 0;
+		int swf = 0;
+		int docx = 0;
+		int mp3 = 0;
 		
 		for (String s : links) {
 
@@ -133,6 +138,12 @@ public class FetchTask implements Task {
 			else if (s.endsWith(".txt")) txt++;
 			else if (s.endsWith(".text")) text++;
 			else if (s.endsWith(".pptx")) pptx++;
+			else if (s.endsWith(".pps")) pps++;
+			else if (s.endsWith(".wmv")) wmv++;
+			else if (s.endsWith(".swf")) swf++;
+			else if (s.endsWith(".docx")) docx++;
+			else if (s.endsWith(".mp3")) mp3++;
+			
 		}
 
 
@@ -156,6 +167,11 @@ public class FetchTask implements Task {
 		fileMap.put("txt", txt);
 		fileMap.put("text", text);
 		fileMap.put("pptx", pptx);
+		fileMap.put("pps", pps);
+		fileMap.put("wmv", wmv);
+		fileMap.put("swf", swf);
+		fileMap.put("docx", docx);
+		fileMap.put("mp3", mp3);
 		
 		return fileMap;
 	}
@@ -197,7 +213,7 @@ public class FetchTask implements Task {
 	}
 	
 	public boolean linkIsFile(String link) {
-		List<String> ext = Arrays.asList("doc", "pdf", "jpg", "png", "gif", "z", "ps", "gz", "zip", "dvi", "avi", "jpeg", "ppt", "text", "txt", "tex", "tar", "tgz", "ogg", "au", "pptx", "m", "mkv");
+		List<String> ext = Arrays.asList("doc", "pdf", "jpg", "png", "gif", "z", "ps", "gz", "zip", "dvi", "avi", "jpeg", "ppt", "text", "txt", "tex", "tar", "tgz", "ogg", "au", "pptx", "m", "mkv", "pps", "eps", "pgm", "c", "docx", "cl", "tcl", "wmv", "swf", "mp3");
 
 		for (String e : ext) {
 			if (link.toLowerCase().endsWith("." + e)) {

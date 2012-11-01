@@ -234,6 +234,11 @@ public class CrawlerState {
 			}
 		}
 		
+		for (Page u : errorList) {
+			if (url.equals(u)) {
+				return true;
+			}
+		}
 		return false;
 	}
 
