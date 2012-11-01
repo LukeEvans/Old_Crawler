@@ -73,9 +73,6 @@ public class CrawlerState {
 
 		String url = lineParts[0];
 		String domain = lineParts[1];
-
-		System.out.println("url : " + url);
-		System.out.println("domain : " + domain);
 		
 		if (url.endsWith("/")) {
 			url = url.substring(0, url.length()-1);
