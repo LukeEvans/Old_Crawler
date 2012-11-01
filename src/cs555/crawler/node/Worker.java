@@ -70,7 +70,7 @@ public class Worker extends Node{
 			FetchRequest request = new FetchRequest();
 			request.unmarshall(bytes);
 
-			System.out.println("Got handoff\n" + request.url + " Depth: " + request.depth);
+			//System.out.println("Got handoff\n" + request.url + " Depth: " + request.depth);
 
 			publishLink(request);
 
