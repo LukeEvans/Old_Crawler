@@ -19,6 +19,8 @@ public class CrawlerState {
 	String linkFile;
 	int maxDepth;
 	
+	public int numberOfCrawlers;
+	
 	//================================================================================
 	// Constructors
 	//================================================================================
@@ -29,6 +31,7 @@ public class CrawlerState {
 		pendingList = new ArrayList<Page>();
 		doneList = new ArrayList<Page>();
 		maxDepth = Constants.depth;
+		numberOfCrawlers = 0;
 		
 		buildState();
 	}
@@ -107,7 +110,7 @@ public class CrawlerState {
 		ArrayList<Page> readySet= new ArrayList<Page>();
 		
 		for (int i=0; i<n; i++){
-			readySet.add(getNextReadyPage());
+			readySet.add(readyList.get(i));
 		}
 		
 		return readySet;

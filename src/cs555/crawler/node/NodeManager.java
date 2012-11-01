@@ -13,6 +13,7 @@ import cs555.crawler.wireformats.ElectionMessage;
 import cs555.crawler.wireformats.FetchRequest;
 import cs555.crawler.wireformats.FetchResponse;
 import cs555.crawler.wireformats.HandoffLookup;
+import cs555.crawler.wireformats.NodeComplete;
 
 public class NodeManager extends Node{
 	
@@ -62,15 +63,32 @@ public class NodeManager extends Node{
 	//================================================================================
 	public void broadcastElection(){
 		
-		for (Page page : state.getAllPages()) {
+		ArrayList<Page> allDomains = new ArrayList<Page>(state.getAllPages());
+		
+		for (Page page : allDomains) {
+			System.out.println("Looking for place for domain : " + page.domain);
+			state.makrUrlPending(page);
+			
 			Peer peer = peerList.getReadyPeer();
 			peer.setDomain(page.domain);
 			
-			ElectionMessage electionMsg = new ElectionMessage(serverPort, Tools.getLocalHostname(), page.domain, page.urlString);
-			sendBytes(peer, electionMsg.marshall());
+			synchronized (state) {
+				state.numberOfCrawlers++;
+				ElectionMessage electionMsg = new ElectionMessage(serverPort, Tools.getLocalHostname(), page.domain, page.urlString);
+				sendBytes(peer, electionMsg.marshall());
+			}
+			
+
 		}
 	}
 
+	public void broadcastCompletion() {
+		NodeComplete complete = new NodeComplete(Constants.Node_Complete);
+		
+		for (Peer p : peerList.getAllPendingPeers()) {
+			sendBytes(p, complete.marshall());
+		}
+	}
 	
 	//================================================================================
 	// Receive
@@ -103,6 +121,17 @@ public class NodeManager extends Node{
 				sendBytes(leader, handoff.marshall());
 			}
 			
+			break;
+			
+		case Constants.Node_Complete:
+			
+			synchronized (state) {
+				state.numberOfCrawlers--;
+				if (state.numberOfCrawlers == 0) {
+					// Broadcast to everyone to print data
+					broadcastCompletion();
+				}
+			}
 			break;
 			
 		default:

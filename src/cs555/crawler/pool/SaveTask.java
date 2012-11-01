@@ -36,7 +36,7 @@ public class SaveTask {
 			out.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println("Error Saving file: " + urlString);
 		}
 
 	}
@@ -45,7 +45,9 @@ public class SaveTask {
 	// Linter
 	//================================================================================
 	public String getFilename() {
-		String url = urlString.replace("/", "\\");
+		String url = urlString.replace("http://www.", "");
+		url = url.replace("https://www.", "S");
+		url = url.replace("/", "\\");
 		return Constants.base_path + url;
 	}
 

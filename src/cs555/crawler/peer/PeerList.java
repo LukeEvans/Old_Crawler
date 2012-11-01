@@ -146,6 +146,19 @@ public class PeerList {
 		return listOfPeers.get(0);
 	}
 	
+	// Get all peers we're waiting on
+	public ArrayList<Peer> getAllPendingPeers() {
+		ArrayList<Peer> pending = new ArrayList<Peer>();
+		
+		for (Peer p : listOfPeers) {
+			if (!p.ready) {
+				pending.add(p);
+			}
+		}
+		
+		return pending;
+	}
+	
 	// Get all peers
 	public ArrayList<Peer> getAllPeers(){
 		return listOfPeers;
@@ -158,9 +171,9 @@ public class PeerList {
 	// Get peer for a domain
 	public Peer findDomainLeader(String d) {
 		for (Peer p : listOfPeers) {
-			if (p.domain != null) {
+			if (!p.domain.equalsIgnoreCase("")) {
 				if (d.contains("." + p.domain)) {
-					System.out.println(d + " " + p.domain);
+					//System.out.println(d + " " + p.domain);
 					return p;
 				}
 			}

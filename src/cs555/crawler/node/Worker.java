@@ -11,6 +11,7 @@ import cs555.crawler.utilities.Tools;
 import cs555.crawler.wireformats.ElectionMessage;
 import cs555.crawler.wireformats.FetchRequest;
 import cs555.crawler.wireformats.HandoffLookup;
+import cs555.crawler.wireformats.NodeComplete;
 import cs555.crawler.wireformats.Verification;
 import cs555.crawler.peer.Peer;
 import cs555.crawler.pool.*;
@@ -69,12 +70,18 @@ public class Worker extends Node{
 			FetchRequest request = new FetchRequest();
 			request.unmarshall(bytes);
 
-			System.out.println("Got: \n" + request);
+			System.out.println("Got handoff\n" + request.url + " Depth: " + request.depth);
 
 			publishLink(request);
 
 			break;
 
+		case Constants.Node_Complete:
+			printDomainInfo();
+			System.exit(0);
+			
+			break;
+			
 		default:
 			System.out.println("Unrecognized Message");
 			break;
@@ -97,10 +104,6 @@ public class Worker extends Node{
 		synchronized (state) {
 			Page page = new Page(request.url, request.depth, request.domain);
 			
-			if (request.url.contains("achter")) {
-				System.out.println(request.url);
-			}
-			
 			if (state.addPage(page)) {
 				state.makrUrlPending(page);
 				fetchURL(page, request);
@@ -111,9 +114,6 @@ public class Worker extends Node{
 
 
 	public void fetchURL(Page page, FetchRequest request) {
-		if (request.url.contains("achter")) {
-			System.out.println("Fetching: " + request.url);
-		}
 		
 		//System.out.println("Fetching : " + request.url);
 		FetchTask fetcher = new FetchTask(page, request, this);
@@ -127,10 +127,6 @@ public class Worker extends Node{
 	//================================================================================
 	public void linkComplete(Page page, ArrayList<String> links, HashMap<String, Integer> fileMap) {
 		//System.out.println("Link complete : " + page.urlString);
-
-		if (page.urlString.contains("achter")) {
-			System.out.println("Completed: " + page.urlString);
-		}
 		
 		synchronized (state) {
 			state.findPendingUrl(page).accumulate(links, fileMap);
@@ -159,12 +155,9 @@ public class Worker extends Node{
 
 		// If we're done, print
 		if (!state.shouldContinue()) {
-			printDomainInfo();
+			NodeComplete complete = new NodeComplete(Constants.Node_Complete);
+			sendBytes(nodeManager, complete.marshall());
 		}	
-
-		else {
-			//System.out.println(state.remaining());
-		}
 
 	}
 
@@ -176,11 +169,8 @@ public class Worker extends Node{
 
 			// If we're done, print
 			if (!state.shouldContinue()) {
-				printDomainInfo();
-			}
-			
-			else {
-				//System.out.println(state.remaining());
+				NodeComplete complete = new NodeComplete(Constants.Node_Complete);
+				sendBytes(nodeManager, complete.marshall());
 			}
 		}
 	}

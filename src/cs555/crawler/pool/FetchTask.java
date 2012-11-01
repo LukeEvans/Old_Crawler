@@ -55,7 +55,7 @@ public class FetchTask implements Task {
 
 			ArrayList<String> urls = new ArrayList<String>();
 
-			Document doc = Jsoup.connect(urlString).timeout(6000).get();
+			Document doc = Jsoup.connect(urlString).ignoreHttpErrors(true).timeout(6000).get();
 			Elements links = doc.select("a[href]");
 			
 			String text = "";
@@ -71,13 +71,14 @@ public class FetchTask implements Task {
 			for (Element link : links) {
 				urls.add(link.attr("abs:href"));
 			}
-
+			
 			ArrayList<String> freshLinks = removeBadDomains(urls);
 			node.linkComplete(page, freshLinks, getFileMap(urls));
 
 			SaveTask saver = new SaveTask(urlString, text);
 			saver.save();
 
+			
 
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -103,7 +104,16 @@ public class FetchTask implements Task {
 		int aspx = 0;
 		int asp = 0;
 		int php = 0;
-
+		int ps = 0;
+		int tar = 0;
+		int gz = 0; 
+		int zip = 0;
+		int avi = 0;
+		int ppt = 0;
+		int txt = 0;
+		int text = 0;
+		int pptx = 0;
+		
 		for (String s : links) {
 
 			if (s.endsWith(".html")) html++;
@@ -114,6 +124,15 @@ public class FetchTask implements Task {
 			else if (s.endsWith(".aspx")) aspx++;
 			else if (s.endsWith(".asp")) asp++;
 			else if (s.endsWith(".php")) php++;
+			else if (s.endsWith(".ps")) ps++;
+			else if (s.endsWith(".tar")) tar++;
+			else if (s.endsWith(".gz")) gz++;
+			else if (s.endsWith(".zip")) zip++;
+			else if (s.endsWith(".avi")) avi++;
+			else if (s.endsWith(".ppt")) ppt++;
+			else if (s.endsWith(".txt")) txt++;
+			else if (s.endsWith(".text")) text++;
+			else if (s.endsWith(".pptx")) pptx++;
 		}
 
 
@@ -128,7 +147,16 @@ public class FetchTask implements Task {
 		fileMap.put("asp", asp);
 		fileMap.put("php", php);
 
-
+		fileMap.put("ps", ps);
+		fileMap.put("tar", tar);
+		fileMap.put("gz", gz);
+		fileMap.put("zip", zip);
+		fileMap.put("avi", avi);
+		fileMap.put("ppt", ppt);
+		fileMap.put("txt", txt);
+		fileMap.put("text", text);
+		fileMap.put("pptx", pptx);
+		
 		return fileMap;
 	}
 
@@ -150,7 +178,7 @@ public class FetchTask implements Task {
 				if (s.contains("." + d)) {
 
 					if (!linkIsFile(s)) { 
-						newList.add(s);
+						newList.add(trim(s));
 						continue;
 					}
 				}
@@ -160,8 +188,16 @@ public class FetchTask implements Task {
 		return newList;
 	}
 
+	public String trim(String s) {
+		if (s.endsWith("/")) {
+			return s.substring(0, s.length()-1);
+		}
+		
+		return s;
+	}
+	
 	public boolean linkIsFile(String link) {
-		List<String> ext = Arrays.asList("doc", "pdf", "jpg", "png", "gif", "z", "ps", "gz", "zip", "dvi", "avi", "jpeg", "ppt", "text", "txt", "tex");
+		List<String> ext = Arrays.asList("doc", "pdf", "jpg", "png", "gif", "z", "ps", "gz", "zip", "dvi", "avi", "jpeg", "ppt", "text", "txt", "tex", "tar", "tgz", "ogg", "au", "pptx", "m", "mkv");
 
 		for (String e : ext) {
 			if (link.toLowerCase().endsWith("." + e)) {
