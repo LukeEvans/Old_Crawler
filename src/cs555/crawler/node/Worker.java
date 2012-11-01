@@ -180,10 +180,12 @@ public class Worker extends Node{
 	// Printing
 	//================================================================================
 	public void printDomainInfo() {
-		System.out.println("\n================================================================================");
-		System.out.println("Diagnostics for domain : " + domain);
-		System.out.println(state.diagnostics());
-		System.out.println("================================================================================\n");
+		synchronized (state) {
+			System.out.println("\n================================================================================");
+			System.out.println("Diagnostics for domain : " + domain);
+			System.out.println(state.diagnostics());
+			System.out.println("================================================================================\n");	
+		}
 	}
 	//================================================================================
 	//================================================================================
