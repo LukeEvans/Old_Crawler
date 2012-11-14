@@ -75,8 +75,8 @@ public class FetchTask implements Task {
 			ArrayList<String> freshLinks = removeBadDomains(urls);
 			node.linkComplete(page, freshLinks, getFileMap(urls));
 
-			SaveTask saver = new SaveTask(urlString, text);
-			saver.save();
+			//SaveTask saver = new SaveTask(urlString, text);
+			//saver.save();
 
 			
 
@@ -121,6 +121,8 @@ public class FetchTask implements Task {
 		
 		for (String s : links) {
 
+			String copy = new String(s);
+			
 			if (s.endsWith(".html")) html++;
 			else if (s.endsWith(".htm")) htm++;
 			else if (s.endsWith(".doc")) doc++;
@@ -143,6 +145,9 @@ public class FetchTask implements Task {
 			else if (s.endsWith(".swf")) swf++;
 			else if (s.endsWith(".docx")) docx++;
 			else if (s.endsWith(".mp3")) mp3++;
+		
+			copy = copy.replace("www.", "");
+			copy = copy.replace(request.domain, "");
 			
 		}
 
@@ -213,7 +218,7 @@ public class FetchTask implements Task {
 	}
 	
 	public boolean linkIsFile(String link) {
-		List<String> ext = Arrays.asList("doc", "pdf", "jpg", "png", "gif", "z", "ps", "gz", "zip", "dvi", "avi", "jpeg", "ppt", "text", "txt", "tex", "tar", "tgz", "ogg", "au", "pptx", "m", "mkv", "pps", "eps", "pgm", "c", "docx", "cl", "tcl", "wmv", "swf", "mp3", "exe", "flv");
+		List<String> ext = Arrays.asList("php", "doc", "pdf", "jpg", "png", "gif", "z", "ps", "gz", "zip", "dvi", "avi", "jpeg", "ppt", "text", "txt", "tex", "tar", "tgz", "ogg", "au", "pptx", "m", "mkv", "pps", "eps", "pgm", "c", "docx", "cl", "tcl", "wmv", "swf", "mp3", "exe", "flv");
 
 		for (String e : ext) {
 			if (link.toLowerCase().endsWith("." + e)) {
